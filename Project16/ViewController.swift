@@ -5,6 +5,13 @@
 //  Created by Keith Crooc on 2021-10-13.
 //
 
+// Challenge
+// 1. Try typecasting the return value from dequeueReusableAnnotationView() so that it's an MKPinAnnotationView. Once that’s done, change the pinTintColor property to your favorite UIColor. ✅
+
+// 2. Add a UIAlertController that lets users specify how they want to view the map. There's a mapType property that draws the maps in different ways. For example, .satellite gives a satellite view of the terrain. ✅
+
+// 3. Modify the callout button so that pressing it shows a new view controller with a web view, taking users to the Wikipedia entry for that city.
+
 import UIKit
 import MapKit
 
@@ -33,6 +40,10 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         mapView.addAnnotations([london, oslo, paris, rome, washington])
         
+        
+//        Add a UIAlertController to let users change the view of the map
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Map type", style: .plain, target: self, action: #selector(changeMapType))
+        
     
     }
     
@@ -42,11 +53,15 @@ class ViewController: UIViewController, MKMapViewDelegate {
         
         let identifier = "Capital"
         
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+        //        challenge 1 - typecast this as MKPinAnnotationView
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKPinAnnotationView
         
         if annotationView == nil {
             annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+//            changing the pin color
+            annotationView?.pinTintColor = .blue
             annotationView?.canShowCallout = true
+            
             
             let btn = UIButton(type: .detailDisclosure)
             annotationView?.rightCalloutAccessoryView = btn
@@ -54,8 +69,9 @@ class ViewController: UIViewController, MKMapViewDelegate {
         } else {
             annotationView?.annotation = annotation
         }
-        
+//        challenge 1 - typecast this as MKPinAnnotationView
         return annotationView
+        
     }
     
     func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
@@ -68,6 +84,25 @@ class ViewController: UIViewController, MKMapViewDelegate {
         present(ac, animated: true)
     }
 
+    @objc func changeMapType() {
+        
+        let mapAC = UIAlertController(title: "Map type", message: "Choose Map View", preferredStyle: .alert)
+        
+        mapAC.addAction(UIAlertAction(title: "Standard", style: .default, handler: {
+            [weak self] _ in
+            self?.mapView.mapType = .standard
+        }))
+        
+        
+        mapAC.addAction(UIAlertAction(title: "Satellite", style: .default, handler: {
+            [weak self] _ in
+            self?.mapView.mapType = .satellite
+        }))
+        
+        present(mapAC, animated: true)
+    }
+    
+    
 
 }
 
